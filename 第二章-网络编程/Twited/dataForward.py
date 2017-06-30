@@ -13,8 +13,11 @@ class DataForwardingProtocol(protocol.Protocol):
 
     def dataReceived(self,data):
 
+        print("data received")
         if self.normalizeNewLines:
             data = re.sub(r"\r\n|\n","\r\n",data)
+
+        print(self.transport)
 
         if self.output:
             self.output.write(data)
@@ -22,12 +25,11 @@ class DataForwardingProtocol(protocol.Protocol):
 class StdioProxyProtocol(DataForwardingProtocol):
 
     def connectionMade(self):
-
         inputForwarder = DataForwardingProtocol()
         inputForwarder.output = self.transport
         inputForwarder.normalizeNewLine = True
         stdioWarpper = stdio.StandardIO(inputForwarder)
-        self.output = stdioWarpper
+        self.output = inputForwarder
         print("Connected to server.Press Ctrl-C to close connection.")
 
 class StdioProxyFactory(protocol.ClientFactory):
@@ -36,6 +38,7 @@ class StdioProxyFactory(protocol.ClientFactory):
 
     def clientConnectionLost(self,transport,reason):
         reactor.stop()
+
     def clientConnectionFailed(self,transport,reason):
         print(reason.getErrorMessage())
         reactor.stop()

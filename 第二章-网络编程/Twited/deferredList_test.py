@@ -10,7 +10,7 @@ def handleAllResult(results,ports):
     reactor.stop()
 
 if __name__ == "__main__":
-
+  
     import sys
     host = sys.argv[1]
     ports = range(1,201)
